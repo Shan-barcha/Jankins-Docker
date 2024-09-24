@@ -1,17 +1,24 @@
 pipeline {
     agent any
-
+    tools {nodejs "node" }
     environment {
         DOCKER_IMAGE = "alishan001/cicd_pipeline"
         DOCKER_CREDENTIALS_ID = "Shan-Docker"  // For DockerHub
         GIT_CREDENTIALS_ID = "github-token"    // New GitHub PAT credential
     }
 
+    environment {
+        DOCKER_IMAGE = "alishan001/cicd_pipeline"
+        DOCKER_CREDENTIALS_ID = "Shan-Docker"  // For DockerHub
+        GIT_CREDENTIALS_ID = "github-token"    // The GitHub token credential ID
+    }
+
     stages {
-        stage('Checkout Code') {
+        stage('Cloning Git') {
             steps {
-                // Use GitHub token for accessing the repository
-                git credentialsId: "${GIT_CREDENTIALS_ID}", url: 'https://github.com/Shan-barcha/Jenkins-Docker.git', branch: 'main'
+                // Clone the repository using GitHub credentials
+                git url: 'https://github.com/Shan-barcha/Jankins-Docker.git',
+                    credentialsId: "${GIT_CREDENTIALS_ID}"
             }
         }
 
