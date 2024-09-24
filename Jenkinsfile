@@ -2,15 +2,16 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "alishan001/cicd_pipeline"    // Your DockerHub repository
-        DOCKER_CREDENTIALS_ID = "Shan-Docker"        // Updated to use the correct credentials ID
+        DOCKER_IMAGE = "alishan001/cicd_pipeline"
+        DOCKER_CREDENTIALS_ID = "Shan-Docker"  // For DockerHub
+        GIT_CREDENTIALS_ID = "github-token"    // New GitHub PAT credential
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                // Pull the code from your GitHub repository
-                git url: 'https://github.com/Shan-barcha/Jenkins-Docker.git', branch: 'main'
+                // Use GitHub token for accessing the repository
+                git credentialsId: "${GIT_CREDENTIALS_ID}", url: 'https://github.com/Shan-barcha/Jenkins-Docker.git', branch: 'main'
             }
         }
 
