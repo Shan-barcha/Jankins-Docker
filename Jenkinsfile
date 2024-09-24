@@ -14,9 +14,10 @@ pipeline {
     stages {
         stage('Cloning Git') {
             steps {
-                // Clone the repository using GitHub credentials
+                // Use the correct branch (most likely "main" instead of "master")
                 git url: 'https://github.com/Shan-barcha/Jankins-Docker.git',
-                    credentialsId: "${GIT_CREDENTIALS_ID}"
+                    credentialsId: "${GIT_CREDENTIALS_ID}",
+                    branch: 'main' // Update this to "main" if your repository uses it
             }
         }
 
@@ -37,15 +38,16 @@ pipeline {
         }
 
         stage('Push Docker Image to DockerHub') {
-            steps {
-                script {
-                    docker.withRegistry('https://index.docker.io/v1/', "${DOCKER_CREDENTIALS_ID}") {
-                        dockerImage.push("${env.BUILD_ID}")
-                        dockerImage.push('latest')
-                    }
-                }
+             steps {
+                 script {
+                   docker.withRegistry('https://index.docker.io/v1/', "${DOCKER_CREDENTIALS_ID}") {
+                   dockerImage.push("${env.BUILD_ID}")
+                   dockerImage.push('latest')
             }
         }
+    }
+}
+
 
         stage('Deploy Container') {
             steps {
