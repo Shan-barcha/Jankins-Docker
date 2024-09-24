@@ -1,10 +1,8 @@
 pipeline {
     agent any
-    tools {nodejs "node" }
-    environment {
-        DOCKER_IMAGE = "alishan001/cicd_pipeline"
-        DOCKER_CREDENTIALS_ID = "Shan-Docker"  // For DockerHub
-        GIT_CREDENTIALS_ID = "github-token"    // New GitHub PAT credential
+
+    tools {
+        nodejs "node"  // Ensure NodeJS Plugin is installed and this "node" matches the configured NodeJS tool
     }
 
     environment {
@@ -24,7 +22,7 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                // Install the project dependencies
+                // Install project dependencies using Node.js
                 sh 'npm install'
             }
         }
@@ -32,19 +30,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build the Docker image from Dockerfile in the repo
+                    // Build the Docker image from Dockerfile in the repository
                     dockerImage = docker.build("${DOCKER_IMAGE}:${env.BUILD_ID}")
-                }
-            }
-        }
-
-        stage('Run Tests (Optional)') {
-            steps {
-                script {
-                    // Run any tests inside the container
-                    dockerImage.inside {
-                        sh 'npm test' // Modify this based on your test script or remove if no tests
-                    }
                 }
             }
         }
@@ -53,7 +40,6 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', "${DOCKER_CREDENTIALS_ID}") {
-                        // Push the built image with both build ID and 'latest' tags
                         dockerImage.push("${env.BUILD_ID}")
                         dockerImage.push('latest')
                     }
@@ -64,7 +50,7 @@ pipeline {
         stage('Deploy Container') {
             steps {
                 script {
-                    // Run the app container, exposing port 8081
+                    // Deploy the container exposing port 8081
                     dockerImage.run('-p 8081:8081')
                 }
             }
@@ -84,66 +70,3 @@ pipeline {
         }
     }
 }
-
-
-
-
-
-// pipeline { 
-  
-//    agent any
-
-//    stages {
-   
-//      stage('Install Dependencies') { 
-//         steps { 
-//            sh 'npm install' 
-//         }
-//      }
-     
-//      stage('Test') { 
-//         steps { 
-//            sh 'echo "testing application..."'
-//         }
-//       }
-
-//          stage("Deploy application") { 
-//          steps { 
-//            sh 'echo "deploying application..."'
-//          }
-
-//      }
-  
-//    	}
-
-//    }
-
-
-// pipeline {
-//   agent any
-//   stages {
-//     stage("checkout") {
-//       steps {
-//         checkout scm
-//       }
-//     }
-
-//     stage("Test") {
-//       steps {
-//         sh 'sudo apt install npm'
-//         sh 'npm test'
-//       }
-//     }
-
-//     stage("Build") {
-//       steps {
-//         sh 'npm run build'
-//       }
-//     }
-
-//     stage("Build Image") {
-//      sh 'docker build -t my-node-app:1.0 .'
-//     }
-//   }
-
-// }
